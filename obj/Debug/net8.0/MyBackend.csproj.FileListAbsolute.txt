@@ -107,3 +107,4 @@ E:\Projects\dotnet\MyBackend\bin\Debug\net8.0\Newtonsoft.Json.dll
 E:\Projects\dotnet\MyBackend\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
 E:\Projects\dotnet\MyBackend\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 E:\Projects\dotnet\MyBackend\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
+E:\Projects\dotnet\MyBackend\obj\Debug\net8.0\MyBackend.sourcelink.json
