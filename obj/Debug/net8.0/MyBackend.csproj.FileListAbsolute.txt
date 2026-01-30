@@ -227,3 +227,10 @@ E:/Projects/dotnet/MyBackend/obj/Debug/net8.0/MyBackend.sourcelink.json
 /Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/obj/Debug/net8.0/MyBackend.pdb
 /Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/obj/Debug/net8.0/MyBackend.genruntimeconfig.cache
 /Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/obj/Debug/net8.0/ref/MyBackend.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.Extensions.Identity.Core.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.Extensions.Identity.Stores.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
+/Users/karam/Development/dotnet/Stock-Market---Social-Media-Platform/bin/Debug/net8.0/BCrypt.Net-Next.dll

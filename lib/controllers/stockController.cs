@@ -4,6 +4,7 @@ using api.Models;
 using api.Helpers;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
@@ -17,8 +18,9 @@ namespace api.Controllers
 
             _stockRepository = stockRepository;
         }
-
+    
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> getAll([FromQuery] QueryObject query)
         {
             var stocks = await _stockRepository.GetAllAsync(query);

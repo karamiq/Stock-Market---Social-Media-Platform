@@ -7,7 +7,12 @@ using models;
 
 namespace helpers
 {
-    public class JwtService
+    public interface IJwtService
+    {
+        string GenerateToken(User user);
+    }
+
+    public class JwtService : IJwtService
     {
         private readonly string _key;
         private readonly string _issuer;
@@ -38,6 +43,14 @@ namespace helpers
                 expires: DateTime.UtcNow.AddMinutes(_expiresInMinutes),
                 signingCredentials: creds
             );
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(_expiresInMinutes),
+                Issuer = _issuer,
+                Audience = _audience,
+                SigningCredentials = creds
+            };
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

@@ -1,63 +1,89 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using api.Dtos.auth;
+using api.Models;
 using dtos.auth;
 using helpers;
-using interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using models;
-using System.Security.Cryptography;
-using System.Text;
+using api.Data;
+using BCrypt.Net;
 
-namespace controllers
+namespace api.Controllers
 {
+    [Route("api/auth")]
     [ApiController]
-    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        private readonly JwtService _jwtService;
+        private readonly ApplicationDBContext _context;
+        private readonly IJwtService _tokenService;
 
-        public AuthController(IUserRepository userRepository, IConfiguration config)
+        public AuthController(ApplicationDBContext context, IJwtService tokenService)
         {
-            _userRepository = userRepository;
-            _jwtService = new JwtService(config);
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-        {
-            var existing = await _userRepository.GetByEmailAsync(dto.Email);
-            if (existing != null) return BadRequest("Email already in use");
-            var user = new User
-            {
-                Username = dto.Username,
-                Email = dto.Email,
-                PasswordHash = HashPassword(dto.Password)
-            };
-            await _userRepository.CreateAsync(user);
-            var token = _jwtService.GenerateToken(user);
-            return Ok(new AuthResultDto { Token = token, ExpiresAt = DateTime.UtcNow.AddMinutes(60) });
+            _context = context;
+            _tokenService = tokenService;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var user = await _userRepository.GetByEmailAsync(dto.Email);
-            if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
-                return Unauthorized();
-            var token = _jwtService.GenerateToken(user);
-            return Ok(new AuthResultDto { Token = token, ExpiresAt = DateTime.UtcNow.AddMinutes(60) });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email.ToLower());
+
+            if (user == null) return Unauthorized("Invalid email!");
+
+            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+                return Unauthorized("Email not found and/or password incorrect");
+
+            return Ok(
+                new NewUserDto
+                {
+                    UserName = user.Username,
+                    Email = user.Email,
+                    Token = _tokenService.GenerateToken(user)
+                }
+            );
         }
 
-        private string HashPassword(string password)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
-        }
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-        private bool VerifyPassword(string password, string hash)
-        {
-            return HashPassword(password) == hash;
+                if (await _context.Users.AnyAsync(x => x.Email == registerDto.Email.ToLower()))
+                    return BadRequest("Email is already taken");
+
+                var user = new User
+                {
+                    Username = registerDto.Username,
+                    Email = registerDto.Email.ToLower(),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(
+                    new NewUserDto
+                    {
+                        UserName = user.Username,
+                        Email = user.Email,
+                        Token = _tokenService.GenerateToken(user)
+                    }
+                );
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
         }
     }
 }
